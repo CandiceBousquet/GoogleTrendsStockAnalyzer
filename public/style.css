@@ -1,6 +1,21 @@
 .area {
 	fill: pink;
 }
+.area-0 {
+	fill: pink;
+}
+.area-1 {
+	fill: purple;
+}
+.area-2 {
+	fill: orange;
+}
+.area-3 {
+	fill: blue;
+}
+.area-4 {
+	fill: green;
+}
 .well {
 	margin-top: 20px;
 }
