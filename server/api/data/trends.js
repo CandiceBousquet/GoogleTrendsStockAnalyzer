@@ -8,6 +8,7 @@ function getInterestOverTime (keyword) {
 			endTime: endDate
 		})
 		.then((res) => {
+			console.log(JSON.parse(res));
 		  return JSON.parse(res);
 		})
 		.catch((err) => {

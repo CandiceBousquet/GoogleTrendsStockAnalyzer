@@ -4,9 +4,8 @@ import SearchBar from '../components/SearchBar';
 import Graph from '../components/Graph';
 import axios from 'axios';
 import csvtojson from 'csvtojson';
-// import { startDate, endDate } from '../graph/constants';
+import { startDate, endDate } from '../graph/constants';
 import jsonp from 'jsonp';
-// import googleFinance from 'google-finance';
 
 export default class extends Component {
 	constructor () {
@@ -30,12 +29,15 @@ export default class extends Component {
 
 	fetchData (keyword, ticker, searchRelatedQueries) {
 		Promise.all([this.getInterestOverTime(keyword, searchRelatedQueries), this.getFinanceData(ticker)])
-			.then(dataArray => {
-				console.log(dataArray[1]);
+			.then(res => {
+				console.log('do i have an array??', res);
+				const data = res[0].timelineData;
+				const relatedQueries = res[0].relatedQueries;
+				const financeData = res[1];
 				this.setState({
-					data: dataArray[0].timelineData,
-					financeData: dataArray[1],
-					relatedQueries: dataArray[0].relatedQueries
+					data,
+					financeData,
+					relatedQueries
 				});
 			})
 			.catch(err => {
@@ -50,6 +52,7 @@ export default class extends Component {
 				}
 			})
 			.then(res => {
+				console.log('sadfasdfasdfas', res.data);
 				return {
 					timelineData: res.data.default.timelineData,
 					relatedQueries: res.data.queries
@@ -60,15 +63,37 @@ export default class extends Component {
 			});
 	}
 
+	getFinanceData (ticker) {
+			return axios.get(`/api/financeData`, {
+				params: {
+					ticker: ticker,
+					startDate: startDate.toISOString().split('T')[0],
+					endDate: endDate.toISOString().split('T')[0],
+				}
+			})
+			.then(res => {
+				console.log('yo!!!!', res.data);
+				return res.data.map(d => {
+					console.log(d.date, new Date(d.date), new Date(d.date).getTime(), d.close);
+					return ({
+						time: new Date(d.date).getTime()/1000,
+						value: d.close
+					});
+				})
+			})
+			.catch(err => {
+				console.error(err);
+			});
+}
 
 // getFinanceData (ticker) {
-// 	googleFinance.historical({
-// 	  symbol: 'NASDAQ:AAPL',
-// 	  from: '2014-01-01',
-// 	  to: '2014-12-31'
-// 	}, function (err, quotes) {
-// 	  	console.log(quotes);
-// 	});
+	// return googleFinance.historical({
+	//   symbol: 'NASDAQ:AAPL',
+	//   from: '2014-01-01',
+	//   to: '2014-12-31'
+	// }, function (err, quotes) {
+	//   	console.log(quotes);
+	// });
 // }
 
 // getFinanceData (ticker) {
@@ -131,37 +156,41 @@ export default class extends Component {
 // 			return jsonArr;
 // 		});
 // }
-	getFinanceData (ticker) {
-		return axios.get('https://www.google.com/finance/historical', {
-				params: {
-					q: `NASDAQ:${ticker}`,
-					startdate: '2010-01-01',
-					enddate: '2017-06-17',
-					output: 'csv'
-				},
-				headers: {
-                	'Access-Control-Allow-Origin': '*'
-            	},
-			}).then(res => {
-				const jsonArr = [];
-				csvtojson({noheader:false})
-					.fromString(res.data)
-					.on('csv', (csvRow) => { // csv => [1, 2, 3] , [4, 5, 6] , etc.
-					    // jsonArr.push(csvRow);
-					    jsonArr.push({
-					    	time: new Date(csvRow[0]).getTime()/1000, // date
-					    	value: [csvRow[4]] // close price
-					    })
-					})
-					.on('done', () => {
-					    console.log('Done parsing data');
-					})
-				return jsonArr;
-			})
-			.catch(err => {
-				console.error(err);
-			})
-	}
+	// getFinanceData (ticker) {
+	// 	console.log('tickaaaaaa');
+	// 	return axios.get('https://www.google.com/finance/historical', {
+	// 			params: {
+	// 				q: `NASDAQ:${ticker}`,
+	// 				startdate: '2010-01-01',
+	// 				enddate: '2017-06-17',
+	// 				output: 'csv'
+	// 			},
+	// 			headers: {
+	// 				'Origin': 'http://google.com/',
+	// 				'X-Requested-With': new XMLHttpRequest(),
+ //                	'Access-Control-Allow-Origin': '*'
+ //            	},
+	// 		}).then(res => {
+	// 			const jsonArr = [];
+	// 			csvtojson({noheader:false})
+	// 				.fromString(res.data)
+	// 				.on('csv', (csvRow) => { // csv => [1, 2, 3] , [4, 5, 6] , etc.
+	// 				    // jsonArr.push(csvRow);
+	// 				    jsonArr.push({
+	// 				    	time: new Date(csvRow[0]).getTime()/1000, // date
+	// 				    	value: [csvRow[4]] // close price
+	// 				    })
+	// 				})
+	// 				.on('done', () => {
+	// 				    console.log('Done parsing data');
+	// 				})
+	// 			return jsonArr;
+	// 		})
+	// 		.catch(err => {
+	// 			console.log('there was an error');
+	// 			console.error(err);
+	// 		})
+	// }
 
 	render () {
 		return (

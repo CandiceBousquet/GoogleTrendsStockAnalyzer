@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
   entry: './browser/index.js', // assumes your entry point is the index.js in the root of your project folder
   output: {
@@ -16,7 +18,29 @@ module.exports = {
         }
       }    ]
   },
-  node: {
-    fs: 'empty'
+  // node: {
+  //   fs: 'empty'
+  // },
+  plugins:[
+    new webpack.DefinePlugin({
+        process: {env: {}}
+    })
+  ],
+  target: 'web',
+  resolve: {
+    fallback: {
+      "os": require.resolve("os-browserify/browser"),
+      "stream": require.resolve("stream-browserify"),
+      "util": require.resolve("util/"),
+      "http": require.resolve("stream-http"),
+      "https": require.resolve("https-browserify"),
+      "zlib": require.resolve("browserify-zlib"),
+      "crypto": require.resolve("crypto-browserify"),
+      "assert": require.resolve("assert/"),
+      "net": false,
+      "tls": false,
+      "path": false,
+      "fs": false,
+    }
   }
 };
