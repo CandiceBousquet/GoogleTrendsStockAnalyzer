@@ -57,7 +57,7 @@
     "dev": "webpack -w",
     "start": "node server/index.js",
     "preinstall": "npx npm-force-resolutions",
-    "postinstall": "npx patch-package",
+    "postinstall": "npx patch-package"
   },
   "browser": {
     "fs": false,
