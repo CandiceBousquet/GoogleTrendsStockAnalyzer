@@ -1,0 +1,52 @@
+diff --git a/node_modules/google-finance/lib/constants.js b/node_modules/google-finance/lib/constants.js
+index 65809a3..108441e 100644
+--- a/node_modules/google-finance/lib/constants.js
++++ b/node_modules/google-finance/lib/constants.js
+@@ -1,2 +1,2 @@
+ exports.COMPANY_NEWS_URL = 'https://finance.google.com/finance/company_news';
+-exports.HISTORICAL_URL = 'http://finance.google.com/finance/historical';
++exports.HISTORICAL_URL = 'https://query1.finance.yahoo.com/v7/finance/download';
+diff --git a/node_modules/google-finance/lib/index.js b/node_modules/google-finance/lib/index.js
+index 6cad177..646c880 100644
+--- a/node_modules/google-finance/lib/index.js
++++ b/node_modules/google-finance/lib/index.js
+@@ -193,11 +193,22 @@ function historical(options, optionalHttpRequestOptions, cb) {
+         .map(function (range) {
+           return Promise.resolve()
+             .then(function () {
+-              return _utils.download(_constants.HISTORICAL_URL, {
+-                q: symbol,
+-                startdate: range.from.format('YYYY-MM-DD'),
+-                enddate: range.to.format('YYYY-MM-DD'),
+-                output: 'csv'
++              const URL = `${_constants.HISTORICAL_URL}/${symbol}`;
++              console.log('before pulling...', URL, symbol, range.from.unix(), range.to.unix());
++              // POSH?period1=1633264596&period2=1664800596&interval=1d&events=history&includeAdjustedClose=true
++              return _utils.download(URL, {
++                // q: symbol,
++                // startdate: range.from.format('YYYY-MM-DD'),
++                // enddate: range.to.format('YYYY-MM-DD'),
++                // output: 'csv',
++                // q: 'POSH',
++                // period1: 1633264596,
++                // period2: 1664800596,
++                period1: range.from.unix(),
++                period2: range.to.unix(),
++                interval: '1d',
++                events: 'history',
++                includeAdjustedClose: true,
+               }, optionalHttpRequestOptions);
+             })
+             .then(_utils.parseCSV)
+diff --git a/node_modules/google-finance/lib/utils.js b/node_modules/google-finance/lib/utils.js
+index b4cfba3..7eb7649 100644
+--- a/node_modules/google-finance/lib/utils.js
++++ b/node_modules/google-finance/lib/utils.js
+@@ -83,6 +83,7 @@ function getDateRanges(from, to) {
+ }
+ 
+ function parseCSV(text) {
++  console.log('csv!!!!', text);
+   return S(text).trim().s.split('\n').map(function (line) {
+     return S(line).trim().parseCSV();
+   });
