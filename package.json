@@ -53,7 +53,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack -w & nodemon server/index.js",
+    "build": "webpack --mode production",
+    "dev": "webpack -w",
+    "start": "node server/index.js",
     "preinstall": "npx npm-force-resolutions"
   },
   "browser": {
