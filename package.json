@@ -56,7 +56,8 @@
     "build": "webpack --mode production",
     "dev": "webpack -w",
     "start": "node server/index.js",
-    "preinstall": "npx npm-force-resolutions"
+    "preinstall": "npx npm-force-resolutions",
+    "postinstall": "npx patch-package",
   },
   "browser": {
     "fs": false,
